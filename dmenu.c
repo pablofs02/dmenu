@@ -206,6 +206,18 @@ drawitem(struct item *item, int x, int y, int w)
 	return r;
 }
 
+static int
+strlen_utf8(char *s) 
+{
+  int i = 0, j = 0;
+  while (s[i]) 
+  {
+    if ((s[i] & 0xc0) != 0x80) j++;
+    i++;
+  }
+  return j;
+}
+
 static void
 drawmenu(void)
 {
@@ -225,8 +237,8 @@ drawmenu(void)
 	w = (lines > 0 || !matches) ? mw - x : inputw;
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	if (passwd) {
-	        censort = ecalloc(1, sizeof(text));
-		memset(censort, '.', strlen(text));
+	    censort = ecalloc(1, sizeof(text));
+        memset(censort, '.', strlen_utf8(text));
 		drw_text(drw, x, 0, w, bh, lrpad / 2, censort, 0);
 		free(censort);
 	} else drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0);
@@ -911,6 +923,7 @@ setup(void)
 	swa.border_pixel = 0;
 	swa.colormap = cmap;
 	swa.event_mask = ExposureMask | KeyPressMask | VisibilityChangeMask;
+    if (!centered) border_width = 0;
 	win = XCreateWindow(dpy, root, x, y, mw, mh, border_width,
 	                    depth, CopyFromParent, visual,
 	                    CWOverrideRedirect | CWBackPixel | CWBorderPixel | CWColormap | CWEventMask, &swa);
