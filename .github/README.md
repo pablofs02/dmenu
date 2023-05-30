@@ -31,4 +31,7 @@ Modificar el archivo ***config.h*** con las opciones que más le guste antes de 
 - **grid**                        (se puede colocar como reja)
 - **gridnav**                     (mejor movimiento en la reja)
 - **password**                    (ocultación para contraseñas)
+
+## ¿Por añadir?
 - **separator**                   (cambia el carácter separador)
+- **Mejor navegación**
