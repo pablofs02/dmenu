@@ -520,8 +520,8 @@ keypress(XKeyEvent *ev)
 		case XK_g: ksym = XK_Home;  break;
 		case XK_G: ksym = XK_End;   break;
 		case XK_k: ksym = XK_Up;    break;
-		case XK_l: ksym = XK_Next;  break;
-		case XK_h: ksym = XK_Prior; break;
+		case XK_l: if (lines) { if (columns > 1) ksym = XK_Right; else ksym = XK_Next; } else ksym = XK_Down;  break;
+		case XK_h: if (lines) { if (columns > 1) ksym = XK_Left; else ksym = XK_Prior; } else ksym = XK_Up; break;
 		case XK_j: ksym = XK_Down;  break;
 		default:
 			return;
