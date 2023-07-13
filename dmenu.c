@@ -45,7 +45,7 @@ struct item {
 static char text[BUFSIZ] = "";
 static char *embed;
 static int bh, mw, mh;
-static int inputw = 0, promptw, passwd = 0;
+static int inputw = 0, promptw, passwd = 0, entrada = 0;
 static int lrpad; /* sum of left and right padding */
 static size_t cursor;
 static struct item *items = NULL;
@@ -710,7 +710,7 @@ readstdin(void)
 	char *line = NULL;
 	size_t i, itemsiz = 0, linesiz = 0;
 	ssize_t len;
-    if(passwd){
+    if(passwd || entrada){
         inputw = lines = 0;
         return;
     }
@@ -929,6 +929,9 @@ main(int argc, char *argv[])
 		else if (!strcmp(argv[i], "-i")) { /* case-insensitive item matching */
 			fstrncmp = strncasecmp;
 			fstrstr = cistrstr;
+        } else if (!strcmp(argv[i], "-e")) {
+            entrada = 1;
+            centered = 1;
 		} else if (!strcmp(argv[i], "-P"))   /* is the input a password */
 			passwd = 1;
 		else if (i + 1 == argc)
