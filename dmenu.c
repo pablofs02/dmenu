@@ -328,6 +328,15 @@ compare_distance(const void *a, const void *b)
 	return da->distance == db->distance ? 0 : da->distance < db->distance ? -1 : 1;
 }
 
+static int
+comparar(char *a, char *b)
+{
+	if (a == b) {
+		return 1;
+	}
+	return 0;
+}
+
 static void
 match(void)
 {
@@ -349,7 +358,7 @@ match(void)
 			/* walk through item text */
 			for (i = 0; i < itext_len && (c = it->text[i]); i++) {
 				/* fuzzy match pattern */
-				if (!fstrncmp(&text[pidx], &c, 1)) {
+				if (!fstrncmp(&text[pidx], &c, 1)) { // cambiar a función que cambie bien
 					if(sidx == -1)
 						sidx = i;
 					pidx++;
@@ -904,16 +913,54 @@ usage(void)
 	    "             [-nhb color] [-nhf color] [-shb color] [-shf color] [-w windowid]", stderr);
 }
 
+int esA(const char * c) {
+	if (*c == *"á" || *c == *"Á") return 1;
+	return 0;
+}
+
+int esE(const char * c) {
+	if (*c == *"é" || *c == *"É") return 1;
+	return 0;
+}
+
+int esI(const char * c) {
+	if (*c == *"í" || *c == *"Í") return 1;
+	return 0;
+}
+
+int esO(const char * c) {
+	if (*c == *"ó" || *c == *"Ó") return 1;
+	return 0;
+}
+
+int esU(const char * c) {
+	if (*c == *"ú" || *c == *"Ú" || *c == *"ü" || *c == *"Ü") return 1;
+	return 0;
+}
+
+int strncasecmp2(const char * a, const char * b, size_t n) {
+	if (*a == *b || *a == tolower(*b) ||
+			(*a == 'a' && esA(b)) ||
+			(*a == 'e' && esE(b)) ||
+			(*a == 'i' && esI(b)) ||
+			(*a == 'o' && esO(b)) ||
+			(*a == 'u' && esU(b)))
+		return 0;
+	// minimizar para buscar exlusivo cuando mayusculas y tildes explicitamente
+	// a A á Á
+	return 1;
+}
+
 int
 main(int argc, char *argv[])
 {
 	XWindowAttributes wa;
 	int i, fast = 0;
 
-    if (caseinsensitive) {
-        fstrncmp = strncasecmp;
-        fstrstr = cistrstr;
-    }
+	if (caseinsensitive) {
+		fstrncmp = strncasecmp2;
+		fstrstr = cistrstr;
+	}
 
 	for (i = 1; i < argc; i++)
 		/* these options take no arguments */
