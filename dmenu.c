@@ -940,6 +940,7 @@ int esU(const char * c) {
 
 int strncasecmp2(const char * a, const char * b, size_t n) {
 	if (*a == *b || *a == tolower(*b) ||
+			(*a == ' ' && *b == '_') ||
 			(*a == 'a' && esA(b)) ||
 			(*a == 'e' && esE(b)) ||
 			(*a == 'i' && esI(b)) ||
@@ -979,9 +980,11 @@ main(int argc, char *argv[])
         } else if (!strcmp(argv[i], "-e")) {
             entrada = 1;
             centered = 1;
-		} else if (!strcmp(argv[i], "-P"))   /* is the input a password */
+		} else if (!strcmp(argv[i], "-P")) {   /* is the input a password */
 			passwd = 1;
-		else if (i + 1 == argc)
+			entrada = 1;
+            centered = 1;
+		} else if (i + 1 == argc)
 			usage();
 		/* these options take one argument */
 		else if (!strcmp(argv[i], "-g")) {   /* number of columns in grid */
