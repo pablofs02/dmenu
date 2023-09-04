@@ -13,6 +13,7 @@
 #include <X11/Xatom.h>
 #include <X11/Xproto.h>
 #include <X11/Xutil.h>
+#include <wchar.h>
 #ifdef XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif
@@ -153,6 +154,19 @@ cistrstr(const char *h, const char *n)
 	return NULL;
 }
 
+int longitud_char(char* texto) {
+	int byte = (unsigned char)*texto;
+	if ((byte & 0x80) == 0x00) {
+		return 1;
+	} else if ((byte & 0xE0) == 0xC0) {
+		return 2;
+	} else if ((byte & 0xF0) == 0xE0) {
+		return 3;
+	} else if ((byte & 0xF8) == 0xF0) {
+		return 4;
+	}
+}
+
 static void
 drawhighlights(struct item *item, int x, int y, int maxw)
 {
@@ -167,13 +181,13 @@ drawhighlights(struct item *item, int x, int y, int maxw)
 	                   ? SchemeSelHighlight
 	                   : SchemeNormHighlight]);
 	for (i = 0, highlight = item->text; *highlight && text[i];) {
+		int pos = longitud_char(highlight);
 		if (!fstrncmp(&text[i], highlight, 1)) {
-			c = highlight[1];
-			highlight[1] = '\0';
+			c = highlight[pos];
+			highlight[pos] = '\0';
 
 			/* get indentation */
 			indent = TEXTW(item->text);
-
 			/* highlight character */
 			drw_text(
 				drw,
@@ -182,10 +196,10 @@ drawhighlights(struct item *item, int x, int y, int maxw)
 				MIN(maxw - indent, TEXTW(highlight) - lrpad),
 				bh, 0, highlight, 0
 			);
-			highlight[1] = c;
-			i++;
+			highlight[pos] = c;
+			i += pos;
 		}
-		highlight++;
+		highlight += pos;
 	}
 }
 

@@ -1,2 +1,30 @@
-# Quehaceres
-- Permitir resaltado de caracteres utf-8.
+1 Mi personalizado dmenu
+Unas ligeras modificaciones y añadiduras a [dmenu]@https://tools.suckless.org/dmenu/ para hacerla más de mi agrado al incluir sus funcionalidades esenciales y mantener a su vez su característica simplicidad.
+
+1.1 Montaje
+Bajarse el repositorio:
+> git clone git@github.com:pablofs02/dmenu
+o
+> git clone https://github.com/pablofs02/dmenu
+Acceder al repositorio:
+> cd dmenu
+Compilar el programa (se requiere de un compilador de C):
+> sudo make install
+
+1.2 Configuración
+Modificar el archivo ***config.h*** con las opciones que más le guste antes de compilar.
+
+1.3 Parches añadidos
+- **alpha**                       (modificar la transparencia del fondo)
+- **border**                      (añade un border alrededor de la ventana)
+- **center**                      (centra la ventana en el centro de la pantalla)
+- **fuzzy**                       (permite emparejamiento por partes)
+- **highlight**                   (colorea las letras coincidentes)
+- **caseinsensitive**             (no distingue mayúsculas y minúsculas)
+- **grid**                        (se puede colocar como reja)
+- **gridnav**                     (mejor movimiento en la reja)
+- **password**                    (ocultación para contraseñas)
+
+1.4 ¿Por añadir?
+- **separator**                   (cambia el carácter separador)
+- **Mejor navegación**
