@@ -1,5 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 #include <ctype.h>
+#include <fontconfig/fontconfig.h>
 #include <locale.h>
 #include <math.h>
 #include <stdio.h>
@@ -69,8 +70,8 @@ static Colormap cmap;
 
 #include "config.h"
 
-static int (*fstrncmp)(const char *, const char *, size_t) = strncmp;
-static char *(*fstrstr)(const char *, const char *) = strstr;
+static int (*fstrncmp)(char *, char *, size_t);
+static char *(*fstrstr)(const char *, const char *);
 static void xinitvisual();
 
 static unsigned int
@@ -154,7 +155,20 @@ cistrstr(const char *h, const char *n)
 	return NULL;
 }
 
-int longitud_char(char* texto) {
+void print_binario(const char * c) {
+	char x = *c;
+	char y = *(c+1);
+	for( int i = 7; i >= 0; i-- ) {
+		printf( "%d", ( x >> i ) & 1 ? 1 : 0 );
+	}
+	printf(" ");
+	for( int i = 7; i >= 0; i-- ) {
+		printf( "%d", ( y >> i ) & 1 ? 1 : 0 );
+	}
+	printf("\n");
+}
+
+int longitud_char(const char* texto) {
 	int byte = (unsigned char)*texto;
 	if ((byte & 0x80) == 0x00) {
 		return 1;
@@ -165,6 +179,7 @@ int longitud_char(char* texto) {
 	} else if ((byte & 0xF8) == 0xF0) {
 		return 4;
 	}
+	return 0;
 }
 
 static void
@@ -197,7 +212,7 @@ drawhighlights(struct item *item, int x, int y, int maxw)
 				bh, 0, highlight, 0
 			);
 			highlight[pos] = c;
-			i += pos;
+			i += longitud_char(&text[i]);
 		}
 		highlight += pos;
 	}
@@ -342,15 +357,6 @@ compare_distance(const void *a, const void *b)
 	return da->distance == db->distance ? 0 : da->distance < db->distance ? -1 : 1;
 }
 
-static int
-comparar(char *a, char *b)
-{
-	if (a == b) {
-		return 1;
-	}
-	return 0;
-}
-
 static void
 match(void)
 {
@@ -371,11 +377,10 @@ match(void)
 			sidx = eidx = -1; /* start of match, end of match */
 			/* walk through item text */
 			for (i = 0; i < itext_len && (c = it->text[i]); i++) {
-				/* fuzzy match pattern */
-				if (!fstrncmp(&text[pidx], &c, 1)) { // cambiar a función que cambie bien
+				if (!fstrncmp(&text[pidx], &(it->text[i]), 1)) {
 					if(sidx == -1)
 						sidx = i;
-					pidx++;
+					pidx += longitud_char(&text[pidx]);
 					if (pidx == text_len) {
 						eidx = i;
 						break;
@@ -927,42 +932,60 @@ usage(void)
 	    "             [-nhb color] [-nhf color] [-shb color] [-shf color] [-w windowid]", stderr);
 }
 
+int igual_utf(const char * a, const char * b) {
+	if (*a != *b) return 0;
+	int la = longitud_char(a);
+	if (la == 1) {
+		return 1;
+	}
+	int lb = longitud_char(b);
+	if (la != lb) return 0;
+	if (la == 2) {
+		if (*a == *b && *(a+1) == *(b+1)) return 1;
+	} else if (la == 3) {
+		if (*a == *b && *(a+1) == *(b+1) && *(a+2) == *(b+2)) return 1;
+	} else if (la == 4) {
+		if (*a == *b && *(a+1) == *(b+1) && *(a+2) == *(b+2) && *(a+3) == *(b+3)) return 1;
+	}
+	return 0;
+}
+
 int esA(const char * c) {
-	if (*c == *"á" || *c == *"Á") return 1;
+	if (longitud_char(c) != 2) return 0;
+	if (igual_utf(c, "á") || igual_utf(c, "Á")) return 1;
 	return 0;
 }
 
 int esE(const char * c) {
-	if (*c == *"é" || *c == *"É") return 1;
+	if (igual_utf(c, "é") || igual_utf(c, "É")) return 1;
 	return 0;
 }
 
 int esI(const char * c) {
-	if (*c == *"í" || *c == *"Í") return 1;
+	if (igual_utf(c, "í") || igual_utf(c, "Í")) return 1;
 	return 0;
 }
 
 int esO(const char * c) {
-	if (*c == *"ó" || *c == *"Ó") return 1;
+	if (igual_utf(c, "ó") || igual_utf(c, "Ó")) return 1;
 	return 0;
 }
 
 int esU(const char * c) {
-	if (*c == *"ú" || *c == *"Ú" || *c == *"ü" || *c == *"Ü") return 1;
+	if (igual_utf(c, "ú") || igual_utf(c, "Ú") || igual_utf(c, "ü") || igual_utf(c, "Ü")) return 1;
 	return 0;
 }
 
-int strncasecmp2(const char * a, const char * b, size_t n) {
-	if (*a == *b || *a == tolower(*b) ||
+int comp_char(char * a, char * b, size_t n) {
+	if (igual_utf(a, b) || *a == tolower(*b) ||
 			(*a == ' ' && *b == '_') ||
 			(*a == 'a' && esA(b)) ||
 			(*a == 'e' && esE(b)) ||
 			(*a == 'i' && esI(b)) ||
 			(*a == 'o' && esO(b)) ||
-			(*a == 'u' && esU(b)))
+			(*a == 'u' && esU(b)) ||
+			((igual_utf(a, "ñ") && igual_utf(b, "Ñ"))))
 		return 0;
-	// minimizar para buscar exlusivo cuando mayusculas y tildes explicitamente
-	// a A á Á
 	return 1;
 }
 
@@ -972,10 +995,8 @@ main(int argc, char *argv[])
 	XWindowAttributes wa;
 	int i, fast = 0;
 
-	if (caseinsensitive) {
-		fstrncmp = strncasecmp2;
-		fstrstr = cistrstr;
-	}
+	fstrncmp = comp_char;
+	fstrstr = cistrstr;
 
 	for (i = 1; i < argc; i++)
 		/* these options take no arguments */
@@ -988,16 +1009,13 @@ main(int argc, char *argv[])
 			fast = 1;
 		else if (!strcmp(argv[i], "-c"))   /* centers dmenu on screen */
 			centered = 1;
-		else if (!strcmp(argv[i], "-i")) { /* case-insensitive item matching */
-			fstrncmp = strncasecmp;
-			fstrstr = cistrstr;
-        } else if (!strcmp(argv[i], "-e")) {
-            entrada = 1;
-            centered = 1;
+		else if (!strcmp(argv[i], "-e")) {
+			entrada = 1;
+			centered = 1;
 		} else if (!strcmp(argv[i], "-P")) {   /* is the input a password */
 			passwd = 1;
 			entrada = 1;
-            centered = 1;
+			centered = 1;
 		} else if (i + 1 == argc)
 			usage();
 		/* these options take one argument */
