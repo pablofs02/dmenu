@@ -206,7 +206,7 @@ drawhighlights(struct item *item, int x, int y, int maxw)
 			/* highlight character */
 			drw_text(
 				drw,
-				x + indent - lrpad,
+				x + indent - lrpad + 1,
 				y,
 				MIN(maxw - indent, TEXTW(highlight) - lrpad),
 				bh, 0, highlight, 0
