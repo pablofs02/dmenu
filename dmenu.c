@@ -155,20 +155,7 @@ cistrstr(const char *h, const char *n)
 	return NULL;
 }
 
-void print_binario(const char * c) {
-	char x = *c;
-	char y = *(c+1);
-	for( int i = 7; i >= 0; i-- ) {
-		printf( "%d", ( x >> i ) & 1 ? 1 : 0 );
-	}
-	printf(" ");
-	for( int i = 7; i >= 0; i-- ) {
-		printf( "%d", ( y >> i ) & 1 ? 1 : 0 );
-	}
-	printf("\n");
-}
-
-int longitud_char(const char* texto) {
+int long_char(const char* texto) {
 	int byte = (unsigned char)*texto;
 	if ((byte & 0x80) == 0x00) {
 		return 1;
@@ -196,7 +183,7 @@ drawhighlights(struct item *item, int x, int y, int maxw)
 	                   ? SchemeSelHighlight
 	                   : SchemeNormHighlight]);
 	for (i = 0, highlight = item->text; *highlight && text[i];) {
-		int pos = longitud_char(highlight);
+		int pos = long_char(highlight);
 		if (!fstrncmp(&text[i], highlight, 1)) {
 			c = highlight[pos];
 			highlight[pos] = '\0';
@@ -212,7 +199,7 @@ drawhighlights(struct item *item, int x, int y, int maxw)
 				bh, 0, highlight, 0
 			);
 			highlight[pos] = c;
-			i += longitud_char(&text[i]);
+			i += long_char(&text[i]);
 		}
 		highlight += pos;
 	}
@@ -380,7 +367,7 @@ match(void)
 				if (!fstrncmp(&text[pidx], &(it->text[i]), 1)) {
 					if(sidx == -1)
 						sidx = i;
-					pidx += longitud_char(&text[pidx]);
+					pidx += long_char(&text[pidx]);
 					if (pidx == text_len) {
 						eidx = i;
 						break;
@@ -934,11 +921,11 @@ usage(void)
 
 int igual_utf(const char * a, const char * b) {
 	if (*a != *b) return 0;
-	int la = longitud_char(a);
+	int la = long_char(a);
 	if (la == 1) {
 		return 1;
 	}
-	int lb = longitud_char(b);
+	int lb = long_char(b);
 	if (la != lb) return 0;
 	if (la == 2) {
 		if (*a == *b && *(a+1) == *(b+1)) return 1;
@@ -951,28 +938,39 @@ int igual_utf(const char * a, const char * b) {
 }
 
 int esA(const char * c) {
-	if (longitud_char(c) != 2) return 0;
-	if (igual_utf(c, "á") || igual_utf(c, "Á")) return 1;
+	if (long_char(c) != 2) return 0;
+	if (igual_utf(c, "á") || igual_utf(c, "Á") ||
+			igual_utf(c, "à") || igual_utf(c, "À"))
+		return 1;
 	return 0;
 }
 
 int esE(const char * c) {
-	if (igual_utf(c, "é") || igual_utf(c, "É")) return 1;
+	if (igual_utf(c, "é") || igual_utf(c, "É") ||
+			igual_utf(c, "à") || igual_utf(c, "À"))
+		return 1;
 	return 0;
 }
 
 int esI(const char * c) {
-	if (igual_utf(c, "í") || igual_utf(c, "Í")) return 1;
+	if (igual_utf(c, "í") || igual_utf(c, "Í") ||
+			igual_utf(c, "ì") || igual_utf(c, "Ì"))
+		return 1;
 	return 0;
 }
 
 int esO(const char * c) {
-	if (igual_utf(c, "ó") || igual_utf(c, "Ó")) return 1;
+	if (igual_utf(c, "ó") || igual_utf(c, "Ó") ||
+			igual_utf(c, "ò") || igual_utf(c, "Ò"))
+		return 1;
 	return 0;
 }
 
 int esU(const char * c) {
-	if (igual_utf(c, "ú") || igual_utf(c, "Ú") || igual_utf(c, "ü") || igual_utf(c, "Ü")) return 1;
+	if (igual_utf(c, "ú") || igual_utf(c, "Ú") ||
+			igual_utf(c, "ù") || igual_utf(c, "Ù") ||
+			igual_utf(c, "ü") || igual_utf(c, "Ü"))
+		return 1;
 	return 0;
 }
 
