@@ -1,7 +1,9 @@
-# Mi personalizado dmenu
+1. Mi personalizado dmenu
+
 Unas ligeras modificaciones y añadiduras a [dmenu](https://tools.suckless.org/dmenu/) para hacerla más de mi agrado al incluir sus funcionalidades esenciales y mantener a su vez su característica simplicidad.
 
-## Montaje
+1.1. Montaje
+
 Bajarse el repositorio:
 
 `git clone git@github.com:pablofs02/dmenu`
@@ -18,10 +20,11 @@ Compilar el programa (se requiere de un compilador de C):
 
 `sudo make install`
 
-## Configuración
+1.2. Configuración
+
 Modificar el archivo ***config.h*** con las opciones que más le guste antes de compilar.
 
-## Parches añadidos
+1.3. Parches añadidos
 - **alpha**                       (modificar la transparencia del fondo)
 - **border**                      (añade un border alrededor de la ventana)
 - **center**                      (centra la ventana en el centro de la pantalla)
@@ -32,6 +35,6 @@ Modificar el archivo ***config.h*** con las opciones que más le guste antes de 
 - **gridnav**                     (mejor movimiento en la reja)
 - **password**                    (ocultación para contraseñas)
 
-## ¿Por añadir?
+1.4. ¿Por añadir?
 - **separator**                   (cambia el carácter separador)
 - **Mejor navegación**
