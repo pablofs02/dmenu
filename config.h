@@ -6,7 +6,7 @@ static const unsigned int alpha = 0xf0;     /* Amount of opacity. 0xff is opaque
 static int min_width = 500;                    /* minimum width when centered */
 /* -fn option overrides fonts[0]; default X11 font or font set */
 static const char *fonts[] = {
-	"Cascadia Code:size=18"
+	"Cascadia Code:size=15"
 };
 static const char *prompt      = NULL;      /* -p  option; prompt to the left of input field */
 static const char *colors[SchemeLast][2] = {
